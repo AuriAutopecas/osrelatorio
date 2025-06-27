@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Ordens de Serviço</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonte Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .service-order-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            page-break-after: always;
+        }
+        .info-block {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background-color: #f9fafb;
+            margin-bottom: 0.75rem;
+        }
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            text-transform: capitalize;
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            font-size: 0.875rem;
+            color: #1f2937;
+            word-wrap: break-word;
+            text-transform: uppercase;
+        }
+        .parts-section {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .parts-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2937;
+            border-bottom: 1px solid #d1d5db;
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+            text-transform: capitalize;
+        }
+        .part-item {
+            display: grid;
+            grid-template-columns: 0.5fr 3fr 1fr;
+            gap: 0.5rem;
+            padding: 0.2rem 0;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        .part-item .quant,
+        .part-item .value {
+            text-align: right;
+            text-transform: uppercase;
+        }
+        .part-item .desc {
+            text-align: left;
+            text-transform: uppercase;
+        }
+        .part-item:nth-child(odd) {
+            background-color: #fefefe;
+        }
+        .part-item:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        .totals-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #d1d5db;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+        .total-item {
+            text-align: center;
+            padding: 0.5rem;
+            background-color: #e0f2fe;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+        .total-item.grand-total {
+            background-color: #a7f3d0;
+            color: #065f46;
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+        .signature-section {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            text-align: center;
+            font-size: 1.125rem;
+            color: #4b5563;
+            font-weight: 500;
+            width: 100%;
+            max-width: 800px;
+        }
+        #loading .spinner {
+            margin-bottom: 1rem;
+        }
+        #service-orders-container.hidden {
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .card-header-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .card-header-content .logo-and-info {
+                flex-direction: column;
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+            .card-header-content .os-number {
+                margin-top: 0.5rem;
+                text-align: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+
+
+<div class="w-full max-w-4xl mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <input type="text" id="filtroNome" placeholder="Nome do Cliente"
+      class="px-4 py-2 border border-gray-300 rounded shadow-sm" />
+
+    <input type="text" id="filtroCpf" placeholder="CPF"
+      class="px-4 py-2 border border-gray-300 rounded shadow-sm" />
+
+    <input type="text" id="filtroOs" placeholder="Número da OS"
+      class="px-4 py-2 border border-gray-300 rounded shadow-sm" />
+
+    <input type="text" id="filtroMatricula" placeholder="Matrícula"
+      class="px-4 py-2 border border-gray-300 rounded shadow-sm" />
+
+    <input type="date" id="filtroDataInicio"
+      class="px-4 py-2 border border-gray-300 rounded shadow-sm" />
+
+    <input type="date" id="filtroDataFim"
+      class="px-4 py-2 border border-gray-300 rounded shadow-sm" />
+  </div>
+
+  <div class="flex justify-end mt-4 gap-2">
+    <button onclick="aplicarTodosFiltros()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Aplicar Filtros
+    </button>
+    <button onclick="limparFiltros()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
+      Limpar
+    </button>
+  </div>
+</div>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        <span>Carregando dados...</span>
+    </div>
+    <div id="service-orders-container" class="hidden"></div>
+
+    <script>
+        const endpoint = 'https://script.google.com/macros/s/AKfycbzQoM--7pSZGalFiPtYibbbkcYYO4syyj8F7Mp8fEhnZPR6Zj89jOyGL3827_AGltW5DQ/exec?action=getAll';
+
+        function formatCurrency(value) {
+            const numValue = parseFloat(value) || 0;
+            return numValue.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        }
+
+        function createServiceOrderCard(item) {
+            const card = document.createElement('div');
+            card.className = 'service-order-card';
+
+            let pecasHtml = '';
+            let hasPecas = false;
+            for (let i = 0; i <= 8; i++) {
+                const quantKey = i === 0 ? 'Quantpeça' : `Quantpeça${i}`;
+                const nomeKey = i === 0 ? 'Nomepeça' : `Nomepeça${i}`;
+                const valorKey = i === 0 ? 'Valorpeça' : `Valorpeça${i}`;
+
+                const quant = item[quantKey];
+                const nome = item[nomeKey];
+                const valor = item[valorKey];
+
+                if ((nome && String(nome).trim() !== '') || (quant && parseFloat(quant) > 0)) {
+                    hasPecas = true;
+                    pecasHtml += `
+                        <div class="part-item">
+                            <div class="quant">${quant || '0'}</div>
+                            <div class="desc">${nome || ''}</div>
+                            <div class="value">${formatCurrency(valor || 0)}</div>
+                        </div>
+                    `;
+                }
+            }
+            if (!hasPecas) {
+                pecasHtml = `<p class="text-sm text-gray-500 text-center py-2">Nenhuma peça utilizada.</p>`;
+            } else {
+                pecasHtml = `
+                    <div class="part-item font-semibold text-gray-800 border-b border-gray-300 pb-1 mb-1">
+                        <div class="quant text-right">Quant.</div>
+                        <div class="desc text-left">Descrição da Peça</div>
+                        <div class="value text-right">Valor Unitário</div>
+                    </div>
+                    ${pecasHtml}
+                `;
+            }
+
+            const osNumber = String(item['Ordem'] || '').padStart(4, '0');
+            const clienteNome = item.Nome || '';
+            const cpf = item.Cpf ? String(item.Cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '';
+            const telefone = item.Telefone || '';
+            const endereco = item.Endereço || '';
+            const propriedade = item.Propriedade || '';
+
+            const veiculo = item.Veículo || '';
+            const modelo = item.Modelo || '';
+            const cor = item.Cor || '';
+            const matricula = item.Matrícula || '';
+
+            const serviceDescription = item.Serviço || 'Nenhum serviço descrito.';
+            const maodeobra = formatCurrency(item.Maodeobra || 0);
+
+            const totalPecas = formatCurrency(item.Valortotalpeça || 0);
+            const ivaPercentual = (parseFloat(item.Ivapercentual) || 0).toFixed(2) + '%';
+            const totalGeral = formatCurrency(item.Totalgeral || 0);
+
+            const signatureDate = item.Datahora
+                ? new Date(item.Datahora).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                  })
+                : '&nbsp;';
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-4 border-b border-gray-300 pb-3 card-header-content">
+                    <div class="flex items-center logo-and-info">
+                        <img src="logo.png" alt="Logo da Empresa" class="w-[180px] h-[120px] rounded-lg border border-gray-200 object-contain mr-4" onerror="this.onerror=null;this.src='https://placehold.co/120x120/cccccc/000000?text=LOGO';">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800">DR - AUTO MECÂNICA</h2>
+                            <p class="text-xs text-gray-600 leading-tight">Serviços Especializado em Mecânica em Geral</p>
+                            <p class="text-xs text-gray-600 leading-tight">Cuidado, Segurança e Tranquilidade para seu Carro</p>
+                            <p class="text-xs text-gray-600 leading-tight">Tel (13) 2588-6074</p>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-blue-700 os-number">OS: ${osNumber}</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div class="info-block col-span-1 md:col-span-2">
+                        <p class="info-label">Cliente</p>
+                        <p class="info-value">${clienteNome}</p>
+                    </div>
+                    <div class="info-block">
+                        <p class="info-label">Cpf</p>
+                        <p class="info-value">${cpf}</p>
+                    </div>
+                    <div class="info-block">
+                        <p class="info-label">Telefone</p>
+                        <p class="info-value">${telefone}</p>
+                    </div>
+                    <div class="info-block col-span-1 md:col-span-2">
+                        <p class="info-label">Endereço</p>
+                        <p class="info-value">${endereco}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 mb-3">
+                    <div class="info-block">
+                        <p class="info-label">Veículo</p>
+                        <p class="info-value">${veiculo}</p>
+                    </div>
+                    <div class="info-block">
+                        <p class="info-label">Modelo</p>
+                        <p class="info-value">${modelo}</p>
+                    </div>
+                    <div class="info-block">
+                        <p class="info-label">Cor</p>
+                        <p class="info-value">${cor}</p>
+                    </div>
+                    <div class="info-block">
+                        <p class="info-label">Matrícula</p>
+                        <p class="info-value">${matricula}</p>
+                    </div>
+                    <div class="info-block">
+                        <p class="info-label">Propriedade</p>
+                        <p class="info-value">${propriedade}</p>
+                    </div>
+                </div>
+
+                <div class="info-block mb-3">
+                    <p class="info-label">Serviço realizado</p>
+                    <p class="info-value whitespace-pre-wrap">${serviceDescription}</p>
+                </div>
+
+                <div class="parts-section">
+                    <p class="parts-header">Peças utilizadas:</p>
+                    ${pecasHtml}
+                </div>
+
+                <div class="totals-section">
+                    <div class="total-item">
+                        <p class="info-label">Mão de Obra</p>
+                        <p class="info-value">${maodeobra}</p>
+                    </div>
+                    <div class="total-item">
+                        <p class="info-label">Total Peças</p>
+                        <p class="info-value">${totalPecas}</p>
+                    </div>
+                    <div class="total-item">
+                        <p class="info-label">IVA %</p>
+                        <p class="info-value">${ivaPercentual}</p>
+                    </div>
+                    <div class="total-item grand-total">
+                        <p class="info-label">Total Geral</p>
+                        <p class="info-value">${totalGeral}</p>
+                    </div>
+                </div>
+
+                <div class="signature-section">
+                    <div class="w-full text-right text-sm text-gray-700">${signatureDate}</div>
+                    <div class="w-full h-px bg-gray-400 mt-8 mb-1"></div>
+                    <div class="w-full text-center text-sm text-gray-700">${clienteNome}</div>
+                </div>
+            `;
+            return card;
+        }
+
+        async function fetchAndDisplayReport() {
+            const loadingDiv = document.getElementById('loading');
+            const serviceOrdersContainer = document.getElementById('service-orders-container');
+
+            const params = new URLSearchParams();
+
+            try {
+                loadingDiv.classList.remove('hidden');
+                serviceOrdersContainer.classList.add('hidden');
+
+                const response = await fetch(`${endpoint}&${params.toString()}`);
+
+                if (!response.ok) {
+                    loadingDiv.innerHTML = `<span class="text-red-600">Erro de rede: Falha ao carregar dados. Status HTTP: ${response.status}.</span>`;
+                    console.error(`Erro HTTP! Status: ${response.status}`);
+                    return;
+                }
+
+                const responseText = await response.text();
+                console.log('Resposta bruta do Apps Script:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (jsonError) {
+                    loadingDiv.innerHTML = `<span class="text-red-600">Erro: Resposta inválida do Apps Script. Não é JSON válido.</span>`;
+                    console.error('Erro ao parsear JSON da resposta:', jsonError, 'Resposta:', responseText);
+                    return;
+                }
+
+                console.log('Dados recebidos do Apps Script (parsed):', data);
+
+                let reportData = [];
+                if (data && Array.isArray(data.data)) {
+                    reportData = data.data;
+                } else if (Array.isArray(data)) {
+                    reportData = data;
+                } else if (data && data.status === 'erro' && data.message) {
+                    loadingDiv.innerHTML = `<span class="text-red-600">Erro do Apps Script: ${data.message}.</span>`;
+                    console.error('Erro retornado pelo Apps Script:', data.message);
+                    return;
+                } else {
+                    loadingDiv.innerHTML = '<span class="text-red-600">Erro: Formato de dados inesperado do Apps Script. Verifique o console.</span>';
+                    console.error('Formato de dados inesperado do Apps Script:', data);
+                    return;
+                }
+
+                if (reportData.length === 0) {
+                    loadingDiv.innerHTML = '<span class="text-gray-600">Nenhum dado encontrado.</span>';
+                    return;
+                }
+
+                serviceOrdersContainer.innerHTML = '';
+                reportData.forEach(item => {
+                    serviceOrdersContainer.appendChild(createServiceOrderCard(item));
+                });
+
+                loadingDiv.classList.add('hidden');
+                serviceOrdersContainer.classList.remove('hidden');
+
+            } catch (err) {
+                loadingDiv.innerHTML = `<span class="text-red-600">Erro ao carregar dados: ${err.message}. Verifique o console para mais detalhes.</span>`;
+                console.error('Erro ao buscar dados (catch principal):', err);
+                serviceOrdersContainer.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchAndDisplayReport();
+        });
+
+function aplicarTodosFiltros() {
+    const nomeFiltro = document.getElementById("filtroNome").value.toLowerCase();
+    const cpfFiltro = document.getElementById("filtroCpf").value.toLowerCase();
+    const osFiltro = document.getElementById("filtroOs").value.toLowerCase();
+    const matriculaFiltro = document.getElementById("filtroMatricula").value.toLowerCase();
+    const dataInicio = document.getElementById("filtroDataInicio").value;
+    const dataFim = document.getElementById("filtroDataFim").value;
+
+    const cards = document.querySelectorAll(".service-order-card");
+
+    cards.forEach(card => {
+        const nome = card.querySelector(".info-block .info-value")?.textContent?.toLowerCase() || '';
+        const cpf = card.querySelectorAll(".info-block .info-value")[1]?.textContent?.toLowerCase() || '';
+        const os = card.querySelector(".os-number")?.textContent?.replace("OS: ", "").toLowerCase() || '';
+        const matricula = Array.from(card.querySelectorAll(".info-block .info-value"))
+            .find(el => el.previousElementSibling?.textContent?.toLowerCase() === 'matrícula')?.textContent?.toLowerCase() || '';
+        const dataTexto = card.querySelector(".signature-section .text-right")?.textContent || '';
+        const [dia, mes, ano] = dataTexto.split('/');
+        const dataCard = new Date(`${ano}-${mes}-${dia}`);
+
+        const passaFiltro =
+            (!nomeFiltro || nome.includes(nomeFiltro)) &&
+            (!cpfFiltro || cpf.includes(cpfFiltro)) &&
+            (!osFiltro || os.includes(osFiltro)) &&
+            (!matriculaFiltro || matricula.includes(matriculaFiltro)) &&
+            (!dataInicio || dataCard >= new Date(dataInicio)) &&
+            (!dataFim || dataCard <= new Date(dataFim));
+
+        card.style.display = passaFiltro ? "" : "none";
+    });
+}
+
+function limparFiltros() {
+    document.getElementById("filtroNome").value = '';
+    document.getElementById("filtroCpf").value = '';
+    document.getElementById("filtroOs").value = '';
+    document.getElementById("filtroMatricula").value = '';
+    document.getElementById("filtroDataInicio").value = '';
+    document.getElementById("filtroDataFim").value = '';
+    aplicarTodosFiltros();
+}
+
+
+
+    </script>
+</body>
+</html>
