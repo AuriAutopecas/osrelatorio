@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: f3f4f6;
             padding-top: 0.5rem;
             padding-right: 0.5rem;
             padding-bottom: 0.5rem;
@@ -169,129 +169,160 @@
 
     <style>
     @media print {
-        /* Configurações básicas da página para A4 */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 215mm; /* Largura A4 */
-            height: 297mm; /* Altura A4 */
-            font-size: 11px; /* Tamanho da fonte padrão para impressão */
-            overflow: hidden; /* Remove barras de rolagem */
-            -webkit-print-color-adjust: exact; /* Garante que cores de fundo e imagens sejam impressas */
-            print-color-adjust: exact;
-        }
 
-        /* Oculta elementos da UI que não devem aparecer na impressão */
-        .w-full.max-w-4xl, /* Oculta o cabeçalho de filtros/busca */
-        .no-print, /* Classe genérica para ocultar na impressão */
-        .btn-container, /* Se tiver um contêiner de botões */
-        .sidebar /* Se tiver uma sidebar */
-        {
-            display: none !important;
-        }
 
-        /* Ajusta o contêiner principal para ocupar a largura máxima e ter margem superior */
-        #service-orders-container {
-            max-width: 100% !important;
-            width: 100% !important;
-            margin: 0 auto !important; /* Centraliza */
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            margin-top: 5mm !important; /* Margem superior reduzida */
-            display: block !important; /* Garante que seja um bloco */
-        }
+.service-order-card .print-17-width {
+    flex: 0 0 17% !important;
+    max-width: 17% !important;
+    min-width: 17% !important;
+}
 
-        /* Estilo para cada card de serviço na impressão */
-        .service-order-card {
-            page-break-inside: avoid; /* Evita que o card seja cortado no meio da página */
-            break-inside: avoid;
-            margin-bottom: 0.5rem; /* Espaço entre os cards */
-            box-shadow: none !important; /* Remove sombras */
-            border: 1px solid #ccc; /* Adiciona uma borda leve */
-            padding: 0.8rem; /* Reduz o padding */
-            font-size: 11px; /* Garante tamanho de fonte consistente */
-        }
 
-        /* Configurações da página para impressão A4 (margens) */
-        @page {
-            size: A4 portrait; /* Orientação retrato */
-            margin: 5mm 10mm 10mm 10mm; /* Margens: top, right, bottom, left */
-        }
 
-        /* CLASSES GERAIS PARA LAYOUT DE IMPRESSÃO (FLEXBOX) */
-        /* Tornando mais específico e garantindo o flex */
-        .service-order-card .print-flex-row { /* Adicionado .service-order-card para maior especificidade */
-            display: flex !important; /* Habilita Flexbox na impressão */
-            flex-direction: row !important; /* Alinha os itens em linha */
-            flex-wrap: nowrap !important; /* Impede quebras de linha */
-            justify-content: space-between !important; /* Distribui o espaço entre os itens */
-            align-items: flex-start !important; /* Alinha no topo, se necessário */
-            gap: 12px !important; /* Espaço entre os blocos */
-            margin-bottom: 0.75rem !important; /* Margem inferior */
-        }
 
-        /* LARGURAS ESPECÍFICAS PARA IMPRESSÃO */
-        /* Tornando mais específico e garantindo as larguras */
-        .service-order-card .print-70-width { /* Adicionado .service-order-card para maior especificidade */
-            flex: 0 0 70% !important; /* Ocupa exatamente 70% */
-            max-width: 70% !important;
-            margin-bottom: 0 !important; /* Remove margem inferior padrão */
-        }
-
-        .service-order-card .print-30-width { /* Adicionado .service-order-card para maior especificidade */
-            flex: 0 0 30% !important; /* Ocupa exatamente 30% */
-            max-width: 30% !important;
-            margin-bottom: 0 !important;
-        }
-
-        /* O foco principal da sua questão: Cor, Matrícula, Propriedade */
-        .service-order-card .print-33-width { /* Adicionado .service-order-card para maior especificidade */
-            flex: 0 0 calc(33.33% - 8px) !important; /* 33.33% da largura, compensando o gap */
-            max-width: calc(33.33% - 8px) !important;
-            min-width: calc(33.33% - 8px) !important; /* Adicionado para garantir largura mínima */
-            margin-bottom: 0 !important;
-            box-sizing: border-box !important; /* Garante que padding e border sejam incluídos na largura */
-        }
-
-        /* AJUSTES DE FONTES E ESPAÇAMENTOS NA IMPRESSÃO PARA COMPACTAR */
-        .info-label {
-            font-size: 0.65rem !important; /* Reduz o tamanho da label */
-            margin-bottom: 0.1rem !important;
-        }
-        .info-value {
-            font-size: 0.75rem !important; /* Reduz o tamanho do valor */
-        }
-        .part-item .quant, .part-item .desc, .part-item .value {
-            font-size: 0.75rem !important; /* Ajusta o tamanho da fonte das peças */
-        }
-        .parts-header, .totals-section .info-label, .totals-section .info-value {
-            font-size: 0.8rem !important; /* Ajusta o tamanho da fonte de cabeçalhos e totais */
-        }
-        .os-number {
-            font-size: 1.5rem !important; /* Ajusta o tamanho do número da OS */
-        }
-        .logo-and-info img {
-            width: 80px !important; /* Ajusta o tamanho da logo */
-            height: 60px !important;
-            margin-right: 0.5rem !important;
-        }
-        .logo-and-info h2 {
-            font-size: 1rem !important; /* Ajusta o tamanho do título da empresa */
-        }
-        .logo-and-info p {
-            font-size: 0.6rem !important; /* Ajusta o tamanho das informações da empresa */
-        }
-
-        /* Ajustes específicos para os info-blocks para garantir que fiquem compactos */
-        .info-block {
-            padding: 0 !important; /* Remove qualquer padding padrão */
-            margin: 0 !important; /* Remove qualquer margem padrão */
-        }
-        .info-block p {
-            margin: 0 !important; /* Remove margens dos parágrafos dentro dos info-blocks */
-            padding: 0 !important; /* Remove padding dos parágrafos */
-        }
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 225mm;
+        height: 297mm;
+        font-size: 13px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        overflow: hidden;
     }
+
+    @page {
+        size: A4 portrait;
+        margin: 8mm 8mm 8mm 8mm;
+    }
+
+    .w-full.max-w-4xl,
+    .no-print,
+    .btn-container,
+    .sidebar,
+    #loading {
+        display: none !important;
+    }
+
+    #service-orders-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    .service-order-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-bottom: 6px !important;
+        padding: 10px !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        font-size: 13px !important;
+    }
+
+    .info-label {
+        font-size: 0.8rem !important;
+    }
+
+    .info-value,
+    .part-item .quant,
+    .part-item .desc,
+    .part-item .value {
+        font-size: 0.95rem !important;
+    }
+
+    .parts-header,
+    .totals-section .info-label,
+    .totals-section .info-value {
+        font-size: 1rem !important;
+    }
+
+    .os-number {
+        font-size: 1.75rem !important;
+        color: #1e40af !important;
+    }
+
+    .logo-and-info img {
+        width: 80px !important;
+        height: 60px !important;
+        margin-right: 0.5rem !important;
+    }
+
+    .logo-and-info h2 {
+    font-size: 1.6rem !important; /* ~17px */
+    font-weight: 800 !important;
+    color: #1f2937 !important;
+}
+
+.logo-and-info p {
+    font-size: 0.95rem !important; /* ~13px */
+    font-weight: 500 !important;
+}
+
+
+    .info-block {
+        margin: 0 !important;
+        padding: 3px 6px !important;
+    }
+
+    .info-block p {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .signature-section {
+        margin-top: 0.5rem !important;
+    }
+
+    .totals-section {
+        margin-top: 0.5rem !important;
+        padding-top: 0.5rem !important;
+        gap: 6px !important;
+    }
+
+    .total-item {
+        padding: 4px !important;
+    }
+
+    .total-item.grand-total {
+        font-size: 1.15rem !important;
+    }
+
+    /* Manter layout dos blocos lado a lado */
+    .service-order-card .print-flex-row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .service-order-card .print-70-width {
+        flex: 0 0 70% !important;
+        max-width: 70% !important;
+    }
+
+    .service-order-card .print-30-width {
+        flex: 0 0 30% !important;
+        max-width: 30% !important;
+    }
+
+    .service-order-card .print-33-width {
+        flex: 0 0 calc(33.33% - 8px) !important;
+        max-width: calc(33.33% - 8px) !important;
+        min-width: calc(33.33% - 8px) !important;
+    }
+
+    /* Evita quebra de página entre os cards */
+    .service-order-card {
+        page-break-after: auto !important;
+    }
+}
+
     </style>
     </head>
 <body>
@@ -426,7 +457,7 @@
                         <p class="info-label">Cliente</p>
                         <p class="info-value">${clienteNome}</p>
                     </div>
-                    <div class="info-block w-full md:w-[35%] print-35-width">
+                    <div class="info-block w-full md:w-[35%] print-17-width">
                         <p class="info-label">NIF</p>
                         <p class="info-value">${cpf}</p>
                     </div>
@@ -437,7 +468,7 @@
                         <p class="info-label">Endereço</p>
                         <p class="info-value">${endereco}</p>
                     </div>
-                    <div class="info-block w-full md:w-[35%] print-35-width">
+                    <div class="info-block w-full md:w-[35%] print-17-width">
                         <p class="info-label">Telemóvel</p>
                         <p class="info-value">${telefone}</p>
                     </div>
